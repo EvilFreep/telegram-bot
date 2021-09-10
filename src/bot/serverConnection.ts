@@ -1,3 +1,8 @@
-import { httpclient } from 'typescript-http-client';
-import Response = httpclient.Response;
-import Request = httpclient.Request;
+import axios, { AxiosResponse } from 'axios';
+
+export async function getRequest(url: string):Promise<any> {
+    axios.get(url).then( 
+    data => {
+    return  data.data
+    })
+}

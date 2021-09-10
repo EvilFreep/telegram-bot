@@ -2,8 +2,8 @@ import { Telegraf, session, Scenes, Markup, Context }  from 'telegraf';
 import { getConfig } from '../config/config';
 import MyContext from './extededContext';
 import  searchScene  from './searchScene'
-import { saveQuizData, parsePoll, initQuizData, showQuizData } from './funcs';
-import quizScene from './quizScene';
+import { saveQuizData, parsePoll, initQuizData, showQuizData } from './funcsSaveDataFromPoll';
+import quizScene, { askAnswer, incIterator, showIterator } from './quizScene';
 
 const config = getConfig('tlg_bot_');
 const bot = new Telegraf<MyContext>(config.bot_section.bot_token);
@@ -30,11 +30,11 @@ bot.start(ctx =>{
 bot.action(/.+/, (ctx) => {
   if(ctx.match[0] == "search")
   {
-    initQuizData()
     ctx.scene.enter('search')
   }
   if(ctx.match[0] == "quiz")
   {
+    initQuizData()
     ctx.scene.enter('quiz')
   }
 })
@@ -43,7 +43,7 @@ bot.on('poll', (ctx) => {
   const dataPoll = parsePoll(ctx)
   if(dataPoll.includes('Другое'))
   {
-    ctx.reply('Распишите подробнее дургой вариант в следующем сообщении')
+    //ctx.reply('Распишите подробнее дургой вариант в следующем сообщении')
   }
   else
   {

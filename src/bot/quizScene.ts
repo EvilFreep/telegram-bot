@@ -1,15 +1,24 @@
 import { Telegraf, Scenes, Markup, Context}  from 'telegraf';
-import { pollRequest } from 'telegraf/typings/button';
+import { callback, pollRequest } from 'telegraf/typings/button';
+import { inlineKeyboard } from 'telegraf/typings/markup';
 import { BaseScene, Stage } from 'telegraf/typings/scenes';
 import { createTextChangeRange, NumericLiteral } from 'typescript';
 import MyContext from './extededContext'
-import { saveQuizData, showQuizData } from './funcs';
+import { saveQuizData, showQuizData, sendQuizDataOnServer } from './funcsSaveDataFromPoll';
 
 const { enter, leave } = Scenes.Stage
 const numOfQ: number = 3
 let i: number = 1;
 
-function askAnswer(i: number, ctx: MyContext) {
+export function incIterator() {
+  i++;
+}
+
+export function showIterator(): number {
+  return i;
+}
+
+ export function askAnswer(i: number, ctx: MyContext) {
   switch (i) {
     case 1:
     {
@@ -44,7 +53,7 @@ function askAnswer(i: number, ctx: MyContext) {
     case 7:
     {
       ctx.reply('8.Каковы решающие факторы/критерии при выборе подрядчика? (Этот вопрос можно пропустить нажав кнопку ниже)', 
-      Markup.inlineKeyboard([Markup.button.callback('Пропустить', 'skipQ')]));
+      Markup.inlineKeyboard([Markup.button.callback('Пропустить', 'skipQ')], ));
       break;     
     }
     case 8:
@@ -77,11 +86,13 @@ function askAnswer(i: number, ctx: MyContext) {
       ctx.replyWithPoll('14.Укажите платформы которые должны поддерживатся', 
       ['iOS (iPhone and  iPad)', 'iPhone only', 'iPad only', 'Apple Watch',
     'Apple TV', 'Android smartphones only', 'Android tablets only', 'Android smartphones and tablets', 'Web', 'Другое'], { is_anonymous: true, allows_multiple_answers: true});
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;     
     }
     case 14:
     {
-      ctx.replyWithPoll('15.Кто его целевая аудитория?', ['Да', 'Нет', 'Другое'], { is_anonymous: true });
+      ctx.replyWithPoll('15.Есть ли какая-либо документация (ТЗ, спецификации, макеты экранов, интерактивный прототип)?', ['Да', 'Нет', 'Другое'], { is_anonymous: true });
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;     
     }
     case 15:
@@ -94,7 +105,7 @@ function askAnswer(i: number, ctx: MyContext) {
       ctx.replyWithPoll('17.Укажите версии ОС, которые должны поддерживаться',
        ['IOS 8+', 'Andriod 4+', 'Другое'],
         { is_anonymous: true});
-      ctx.reply('', Markup.inlineKeyboard([Markup.button.callback('Пропустить', 'skipQ')]));
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;     
     }
     case 17:
@@ -117,9 +128,10 @@ function askAnswer(i: number, ctx: MyContext) {
       ctx.replyWithPoll('21.Будет ли предоставляться дизайн, или его необходимо создать с нуля?',
        ['Нет, нам нужно создать дизайн с нуля',
         'У нас есть иконки приложения',
-        'У нас есть окончательный дизайн, и наш дизайнер уже подготовил все ресурсы для разработки в соответствии с вашими стандартами',
+        'У нас есть окончательный дизайн',
         'Другое'],
         { is_anonymous: true});
+        ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
         break;
     }
     case 21:
@@ -131,12 +143,12 @@ function askAnswer(i: number, ctx: MyContext) {
         'Пока не уверен',
         'Другое'],
       { is_anonymous: true});
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;
     }
     case 22:
     {
-      ctx.reply('23.Будет ли приложение многоязычным? Какие языки оно должно поддерживать?');
-      ctx.reply('', Markup.inlineKeyboard([Markup.button.callback('Пропустить', 'skipQ')]));
+      ctx.reply('23.Будет ли приложение многоязычным? Какие языки оно должно поддерживать?', Markup.inlineKeyboard([Markup.button.callback('Пропустить', 'skipQ')]));
       break;
     }
     case 23:
@@ -147,6 +159,7 @@ function askAnswer(i: number, ctx: MyContext) {
         'Еще не знаю',
         'Другое'],
       { is_anonymous: true});
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;
     }
     case 24:
@@ -155,6 +168,7 @@ function askAnswer(i: number, ctx: MyContext) {
         ['Да', 'Нет',
         'Другое'],
       { is_anonymous: true});
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;
     }
     case 25:
@@ -162,7 +176,7 @@ function askAnswer(i: number, ctx: MyContext) {
       ctx.replyWithPoll('26.Если да, то будет ли предоставляться бэкэнд, API?',
         ['Да', 'Нет'],
       { is_anonymous: true});
-      ctx.reply('', Markup.inlineKeyboard([Markup.button.callback('Пропустить', 'skipQ')]));
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;
     }
     case 26:
@@ -171,6 +185,7 @@ function askAnswer(i: number, ctx: MyContext) {
         ['Портрет', 'Пейзаж',
         'Портретный и Пейзаж'],
       { is_anonymous: true});
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;
     }
     case 27:
@@ -179,6 +194,7 @@ function askAnswer(i: number, ctx: MyContext) {
         ['Ды', 'Нет',
         'Другое'],
       { is_anonymous: true});
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;
     }
     case 28:
@@ -201,12 +217,12 @@ function askAnswer(i: number, ctx: MyContext) {
         '10 млн. руб. - 15 млн. руб.',
         '15 млн. руб. +'],
       { is_anonymous: true});
+      ctx.reply('Нажмите на кнопку ниже когда ответите', Markup.inlineKeyboard([Markup.button.callback('Я ответил', 'answer')], ));
       break;
     }
     case 31:
     {
       ctx.reply('32.Прочие комментарии/ нюансы, которые должна учитывать команда');
-      ctx.reply('', Markup.inlineKeyboard([Markup.button.callback('Пропустить', 'skipQ')]));
       break;     
     }
   }
@@ -237,18 +253,34 @@ quizScene.leave((ctx) => {
 quizScene.command('back', leave<MyContext>())
 
 quizScene.on('text', (ctx) => {
-  saveQuizData( ctx.message.text )
+  if (i < 32) {
+    saveQuizData( ctx.message.text )
+    askAnswer(i, ctx)
+    i += 1
+  } else {
+    ctx.reply("Спасибо за участие в опросе!")
+    saveQuizData( ' ' )
+    if(sendQuizDataOnServer())
+    {
+      ctx.reply('Ваш голос учтен!')
+    } else {
+      ctx.reply('что то пошло не так')
+    }
+  }
+})
+
+quizScene.action('answer', (ctx) => {
   askAnswer(i, ctx)
   i += 1
+  ctx.editMessageText('Спасибо!')
 })
 
 quizScene.action('skipQ', (ctx) => {
   saveQuizData('')
   askAnswer(i, ctx)
   i += 1
+  ctx.editMessageText('Пропущено!')
 })
-
-
 // const quizScene = new Scenes.BaseScene<MyContext>('quiz')
 
 // quizScene.enter((ctx) => ctx.reply('supported commands: /poll /quiz'))
