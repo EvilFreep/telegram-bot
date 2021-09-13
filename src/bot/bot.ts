@@ -55,25 +55,4 @@ bot.on('message', (ctx) => {
   ctx.reply('Напиши /start')
 })
 
-
-// bot.on('poll', (ctx) => console.log('Poll update', ctx.poll))
-// bot.on('poll_answer', (ctx) => console.log('Poll answer', ctx.pollAnswer))
-
-// bot.start((ctx) => ctx.reply('supported commands: /poll /quiz'))
-
-// bot.command('poll', (ctx) => {
-// ctx.replyWithPoll('15.Укажите платформы которые должны поддерживатся', 
-// ['iOS (iPhone and  iPad)', 'iPhone only', 'iPad only', 'Apple Watch',
-// 'Apple TV', 'Android smartphones only', 'Android tablets only', 'Android smartphones and tablets', 'Web'], { is_anonymous: true, allows_multiple_answers: true})
-// console.log( ctx.state )
-// })
-// bot.command('quiz', (ctx) =>
-//   ctx.replyWithQuiz(
-//     '2b|!2b',
-//     ['True', 'False'],
-//     { correct_option_id: 0 }
-//   )
-// )
-
-
 bot.launch();
